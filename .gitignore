@@ -1,0 +1,102 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-wheel-metadata/
+share/python-wheels/
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+venv.bak/
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+*.manifest
+*.spec
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Environment variables and sensitive files
+.env
+.env.local
+.env.*.local
+credentials.json
+
+# Python language server / typecheck caches
+.mypy_cache/
+.pytype/
+.pyre/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Coverage and profiling
+*.prof
+
+# Third-party package metadata
+pip-wheel-metadata/
+
+# Ignore compiled C extensions and build artifacts
+*.so
+*.dylib
+*.dll
+
+# Keep the repo clean for large binary files
+*.pyc
+

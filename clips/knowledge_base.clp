@@ -76,7 +76,7 @@
 
 ; Privacy Settings Rules
 (defrule excessive-permissions-rule
-   (user-profile (app-permissions $?perms&:(> (length$ $?perms) 2)))
+   (user-profile (app-permissions $?perms&:(> (length$ ?perms) 2)))
    =>
    (assert (recommendation
       (priority medium)
@@ -88,7 +88,7 @@
 
 ; Social Media Rules
 (defrule many-social-media-rule
-   (user-profile (social-media $?sm&:(> (length$ $?sm) 3)))
+   (user-profile (social-media $?sm&:(> (length$ ?sm) 3)))
    =>
    (assert (recommendation
       (priority medium)
