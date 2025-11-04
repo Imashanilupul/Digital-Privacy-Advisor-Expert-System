@@ -149,6 +149,19 @@ python scripts\parse_clips.py clips\knowledge_base.clp
 - Add tests for any changes to `src/inference_engine.py` and for additional CLIPS files you add.
 - Follow typical Python project conventions: run tests locally, keep commits small, and open PRs for review.
 
+## License
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+
+You are free to:
+- ✅ Use this project for any purpose (commercial or personal)
+- ✅ Modify and distribute the code
+- ✅ Include it in other projects (open source or proprietary)
+
+As long as you:
+- 📋 Include a copy of the license and copyright notice
+- ⚠️ Don't hold the authors liable for any issues
+
 ## Next improvements (ideas)
 
 - Add `requirements.txt` and `dev-requirements.txt` to pin dependencies.
