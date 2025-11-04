@@ -1,6 +1,15 @@
 # Digital Privacy Advisor — Expert System
 
-A small rule-based expert system that evaluates a user's digital privacy and security posture and produces prioritized recommendations. The project is implemented in Python with a simple, testable inference engine and uses CLIPS rule files for an example knowledge base.
+A small rule-based expert system that evaluates a user's digital privacy and security posture and produces prioritized recommendations. The project is implemented in Python with a modern Streamlit web GUI, a simple testable inference engine, and optional CLIPS rule files for the knowledge base.
+
+## Quick start
+
+```bat
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Then open your browser to `http://localhost:8501` and start the privacy assessment!
 
 ## What is an expert system? (properties and how this app fits)
 
@@ -76,26 +85,36 @@ python -m venv .venv
 .venv\Scripts\activate
 ```
 
-2. Install development dependencies
+2. Install dependencies
 
-There is no pinned `requirements.txt` in this repo by default. For testing and CLIPS support you may want:
-
-```bat
-pip install pytest
-pip install clipspy    # optional: enables loading .clp files from Python tests
-```
-
-Add other dev tools as needed (flake8, mypy, black).
-
-## Running the app (basic)
-
-The repository provides a small runner in `src/main.py`. From the repository root run:
+Install all required packages using the `requirements.txt`:
 
 ```bat
-python -m src.main
+pip install -r requirements.txt
 ```
 
-This will use the Python `InferenceEngine` implementation which does not require CLIPS. If you want to exercise the CLIPS knowledge base directly, install `clipspy` (see above) and use the parser helper in `scripts/` or run the unit tests.
+This will install:
+- `streamlit` — for the web-based GUI
+- `pytest` — for running tests
+- `clipspy` — for CLIPS file parsing and execution (optional for CLIPS testing)
+
+## Running the app — Streamlit GUI
+
+The repository provides a modern web-based chat interface using Streamlit. From the repository root run:
+
+```bat
+streamlit run app.py
+```
+
+This will:
+- Open your default web browser to `http://localhost:8501`
+- Display an interactive chat-style assessment with 10 questions
+- Allow you to navigate forward/backward through questions
+- Show a progress bar and results with color-coded priority levels
+- Provide detailed recommendations sorted by priority (🔴 HIGH, 🟡 MEDIUM, 🟢 LOW)
+- Let you start over and retake the assessment anytime
+
+The GUI runs on pure Python (does not require CLIPS). To enable CLIPS file parsing for advanced testing, `clipspy` is already included in `requirements.txt`.
 
 ## Tests
 
