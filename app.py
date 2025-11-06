@@ -257,38 +257,125 @@ def main():
         run_ai_chatbot()
 
 
+def extract_relevant_rules(user_input: str) -> List[Dict[str, Any]]:
+    """
+    Extract relevant CLIPS rules based on user input keywords.
+    Returns matching recommendations from the knowledge base.
+    """
+    user_input_lower = user_input.lower()
+    
+    # Define keyword-to-rule mappings
+    rule_mappings = {
+        # Password Security
+        ("password", "reuse"): {
+            "priority": "high",
+            "category": "Password Security",
+            "message": "Stop reusing passwords across accounts",
+            "details": "Using the same password for multiple accounts means if one account is compromised, attackers can access all your accounts. This is one of the most common security mistakes.",
+            "action": "Create unique passwords for each service immediately. Use a password manager to generate and store them.",
+            "risk_score": 20,
+            "rule": "password-reuse-rule"
+        },
+        ("password", "manager"): {
+            "priority": "high",
+            "category": "Password Security",
+            "message": "Use a password manager",
+            "details": "A password manager securely stores and encrypts all your passwords, allowing you to use strong, unique passwords for every account without memorizing them.",
+            "action": "Install and set up a reputable password manager like Bitwarden (free), 1Password, or LastPass. Generate strong 16+ character passwords.",
+            "risk_score": 15,
+            "rule": "no-password-manager-rule"
+        },
+        ("2fa", "two-factor", "authentication", "2fa"): {
+            "priority": "high",
+            "category": "Account Security",
+            "message": "Enable Two-Factor Authentication (2FA)",
+            "details": "2FA requires a second verification method (authenticator app, security key) beyond your password. Even if someone has your password, they can't access your account without the second factor.",
+            "action": "Enable 2FA using authenticator apps (Google Authenticator, Microsoft Authenticator, Authy) rather than SMS. Set it up for email, banking, and social media.",
+            "risk_score": 20,
+            "rule": "no-two-factor-rule"
+        },
+        ("vpn", "public wifi", "public wi-fi", "wifi security"): {
+            "priority": "high",
+            "category": "Network Security",
+            "message": "Use VPN on public Wi-Fi networks",
+            "details": "Public Wi-Fi at cafes, airports, and libraries is unencrypted. Attackers can intercept your data, steal passwords, and inject malware. A VPN encrypts all your traffic.",
+            "action": "Install a trusted VPN service (Mullvad VPN, ProtonVPN, or NordVPN). Enable it before connecting to any public network.",
+            "risk_score": 18,
+            "rule": "public-wifi-no-vpn-rule"
+        },
+        ("vpn",): {
+            "priority": "medium",
+            "category": "Network Security",
+            "message": "Consider using a VPN for all internet activity",
+            "details": "A VPN hides your IP address and encrypts your traffic, protecting your privacy from ISPs, network administrators, and advertisers who track your online activity.",
+            "action": "Research and subscribe to a reputable VPN service. Look for no-log policies, good speeds, and reviews from trusted sources.",
+            "risk_score": 12,
+            "rule": "no-vpn-rule"
+        },
+        ("update", "patch", "software", "security update"): {
+            "priority": "high",
+            "category": "Device Security",
+            "message": "Keep your operating system and apps updated",
+            "details": "Security updates patch known vulnerabilities that hackers actively exploit. Delaying updates leaves you exposed to known attacks that could compromise your entire device.",
+            "action": "Enable automatic system updates in your OS settings. Manually check for app updates in your app store. Restart your device when prompted.",
+            "risk_score": 15,
+            "rule": "no-os-update-rule"
+        },
+        ("permission", "privacy settings", "app permission"): {
+            "priority": "medium",
+            "category": "Privacy Settings",
+            "message": "Review and restrict app permissions",
+            "details": "Many apps request unnecessary permissions like location, contacts, and camera. These permissions can be abused to track you or steal personal information.",
+            "action": "Go to Settings → Privacy and revoke unnecessary permissions. Only grant permissions that are essential for app functionality. Disable location sharing by default.",
+            "risk_score": 10,
+            "rule": "excessive-permissions-rule"
+        },
+        ("social media", "facebook", "instagram", "twitter", "privacy settings"): {
+            "priority": "medium",
+            "category": "Social Media Privacy",
+            "message": "Review privacy settings on social media",
+            "details": "Social media platforms default to sharing too much information. Your data can be used for targeted ads, sold to third parties, or exploited for impersonation and social engineering.",
+            "action": "Set profiles to private, disable location sharing, limit who can see your posts, review friend requests, disable tracking, and adjust targeted ad preferences.",
+            "risk_score": 8,
+            "rule": "many-social-media-rule"
+        },
+        ("backup", "data protection", "ransomware"): {
+            "priority": "medium",
+            "category": "Data Protection",
+            "message": "Implement regular data backups",
+            "details": "Backups protect against data loss from ransomware attacks, hardware failure, theft, or accidental deletion. Without backups, losing your device means losing irreplaceable files.",
+            "action": "Set up automated backups using cloud services (Google Drive, OneDrive, iCloud) or external drives. Follow the 3-2-1 rule: 3 copies, 2 different media types, 1 offsite.",
+            "risk_score": 10,
+            "rule": "no-backup-rule"
+        },
+        ("email encryption", "encrypted email", "protonmail", "encryption"): {
+            "priority": "low",
+            "category": "Communication Security",
+            "message": "Consider email encryption for sensitive communications",
+            "details": "Regular emails are sent as plain text and can be intercepted. Encryption ensures only the recipient can read your sensitive messages.",
+            "action": "For highly sensitive information, use ProtonMail or Tutanota for end-to-end encrypted email, or use PGP encryption with your current email provider.",
+            "risk_score": 5,
+            "rule": "no-email-encryption-rule"
+        }
+    }
+    
+    matched_rules = []
+    
+    for keywords, rule_data in rule_mappings.items():
+        for keyword in keywords:
+            if keyword in user_input_lower:
+                if rule_data not in matched_rules:
+                    matched_rules.append(rule_data)
+                break
+    
+    return matched_rules
+
+
 def run_ai_chatbot():
-    """Run the AI chatbot mode."""
+    """Run the AI chatbot mode - searches CLIPS rules and provides explanations."""
     st.markdown("# 🤖 Digital Privacy Advisor Chatbot")
     st.markdown("*Ask me anything about digital privacy and security!*")
-    
-    # API key setup in sidebar
-    with st.sidebar:
-        st.markdown("### 🔑 API Configuration")
-        api_key = st.text_input(
-            "Gemini API Key:",
-            type="password",
-            help="Get from https://aistudio.google.com/app/apikey"
-        )
-        if api_key:
-            st.success("✓ API key set")
-    
-    if not api_key:
-        st.warning("⚠️ Please enter your Gemini API key in the sidebar.")
-        st.markdown("""
-### Getting Started
-1. Get a free key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Paste it in the sidebar
-3. Start chatting!
-        """)
-        return
-    
-    # Import here to avoid load-time errors
-    try:
-        import google.generativeai as genai
-    except ImportError:
-        st.error("Please install google-generativeai: pip install google-generativeai")
-        return
+    st.markdown("💡 I search the expert system knowledge base to provide accurate, explainable answers.")
     
     # Initialize chat
     if "chatbot_messages" not in st.session_state:
@@ -297,10 +384,13 @@ def run_ai_chatbot():
     # Display chat history
     for msg in st.session_state.chatbot_messages:
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            if msg["role"] == "assistant":
+                st.markdown(msg["content"], unsafe_allow_html=True)
+            else:
+                st.markdown(msg["content"])
     
     # User input
-    user_input = st.chat_input("Ask about privacy or security...")
+    user_input = st.chat_input("Ask about privacy or security (e.g., 'How to protect my password?')...")
     
     if user_input:
         # Add user message
@@ -309,22 +399,64 @@ def run_ai_chatbot():
         with st.chat_message("user"):
             st.markdown(user_input)
         
-        # Get bot response
-        try:
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel("gemini-2.5-flash")
+        # Search through CLIPS rules
+        matched_rules = extract_relevant_rules(user_input)
+        
+        with st.chat_message("assistant"):
+            if matched_rules:
+                # Display matched rules from knowledge base
+                response_html = ""
+                
+                for i, rule in enumerate(matched_rules, 1):
+                    priority_icon = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(rule["priority"], "ℹ️")
+                    
+                    response_html += f"""
+<div style="background-color: #f0f8ff; border-left: 4px solid #1f77b4; padding: 1.5rem; margin: 1rem 0; border-radius: 0.5rem;">
+    <h3>{priority_icon} {rule['message']}</h3>
+    
+    <div style="background-color: #fff9e6; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+        <strong>📚 From Knowledge Base - {rule['rule']}:</strong><br>
+        {rule['details']}
+    </div>
+    
+    <div style="background-color: #e8f5e9; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+        <strong>✅ How to prevent/fix this:</strong><br>
+        {rule['action']}
+    </div>
+    
+    <div style="font-size: 0.9rem; color: #666;">
+        <strong>Category:</strong> {rule['category']} | <strong>Risk Score:</strong> +{rule['risk_score']} | <strong>Priority:</strong> {rule['priority'].upper()}
+    </div>
+</div>
+"""
+                
+                st.markdown(response_html, unsafe_allow_html=True)
+                
+                # Save the response
+                assistant_response = f"Found {len(matched_rules)} matching rule(s) from knowledge base"
+                st.session_state.chatbot_messages.append({"role": "assistant", "content": response_html})
             
-            system_prompt = """You are the Digital Privacy Advisor chatbot, an expert in digital privacy and security.
-Provide clear, actionable advice on password security, 2FA, VPNs, data protection, social media privacy, and more.
-Be friendly and non-judgmental. Recommend specific tools when relevant (e.g., Bitwarden, ProtonVPN)."""
-            
-            with st.chat_message("assistant"):
-                with st.spinner("Thinking..."):
-                    response = model.generate_content(f"{system_prompt}\n\nUser: {user_input}")
-                    st.markdown(response.text)
-                    st.session_state.chatbot_messages.append({"role": "assistant", "content": response.text})
-        except Exception as e:
-            st.error(f"Error: {e}")
+            else:
+                # If no rules matched, offer AI enrichment option
+                response = """
+<div style="background-color: #f0f8ff; border-left: 4px solid #1f77b4; padding: 1.5rem; margin: 1rem 0; border-radius: 0.5rem;">
+    <strong>📋 No direct match in the knowledge base.</strong><br><br>
+    Your question doesn't directly match our core privacy rules. Here are topics we cover:
+    <ul>
+        <li>🔐 <strong>Password Security:</strong> Password reuse, password managers</li>
+        <li>🔑 <strong>Account Security:</strong> Two-factor authentication (2FA)</li>
+        <li>🌐 <strong>Network Security:</strong> VPNs, public Wi-Fi safety</li>
+        <li>💻 <strong>Device Security:</strong> Software updates, patches</li>
+        <li>🎯 <strong>Privacy Settings:</strong> App permissions, location sharing</li>
+        <li>📱 <strong>Social Media:</strong> Privacy settings, data exposure</li>
+        <li>💾 <strong>Data Protection:</strong> Backups, ransomware protection</li>
+        <li>✉️ <strong>Email Security:</strong> Email encryption</li>
+    </ul>
+    <strong>💡 Tip:</strong> Try asking about a specific topic above for detailed recommendations!
+</div>
+"""
+                st.markdown(response, unsafe_allow_html=True)
+                st.session_state.chatbot_messages.append({"role": "assistant", "content": response})
 
 
 def run_structured_assessment():
