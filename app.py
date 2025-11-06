@@ -1,6 +1,8 @@
 """
 Streamlit GUI for Digital Privacy Advisor Expert System.
 Provides an interactive, conversational chat-based privacy assessment interface.
+
+Run with: streamlit run app.py
 """
 
 import streamlit as st
@@ -13,7 +15,7 @@ st.set_page_config(
     page_title="Digital Privacy Advisor",
     page_icon="🔒",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Custom CSS for better styling
@@ -240,9 +242,93 @@ def main():
     """Main Streamlit app."""
     initialize_session()
     
-    # Header
-    st.markdown("# 🔒 Digital Privacy Advisor")
-    st.markdown("*Assess your digital privacy and security posture with personalized recommendations*")
+    # Sidebar mode selector
+    with st.sidebar:
+        st.markdown("## � Mode Selection")
+        mode = st.radio(
+            "Choose interaction mode:",
+            ["Structured Assessment", "AI Chatbot"],
+            help="Structured: Follow 10 questions | AI Chatbot: Ask free-form questions"
+        )
+    
+    if mode == "Structured Assessment":
+        run_structured_assessment()
+    else:
+        run_ai_chatbot()
+
+
+def run_ai_chatbot():
+    """Run the AI chatbot mode."""
+    st.markdown("# 🤖 Digital Privacy Advisor Chatbot")
+    st.markdown("*Ask me anything about digital privacy and security!*")
+    
+    # API key setup in sidebar
+    with st.sidebar:
+        st.markdown("### 🔑 API Configuration")
+        api_key = st.text_input(
+            "Gemini API Key:",
+            type="password",
+            help="Get from https://aistudio.google.com/app/apikey"
+        )
+        if api_key:
+            st.success("✓ API key set")
+    
+    if not api_key:
+        st.warning("⚠️ Please enter your Gemini API key in the sidebar.")
+        st.markdown("""
+### Getting Started
+1. Get a free key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Paste it in the sidebar
+3. Start chatting!
+        """)
+        return
+    
+    # Import here to avoid load-time errors
+    try:
+        import google.generativeai as genai
+    except ImportError:
+        st.error("Please install google-generativeai: pip install google-generativeai")
+        return
+    
+    # Initialize chat
+    if "chatbot_messages" not in st.session_state:
+        st.session_state.chatbot_messages = []
+    
+    # Display chat history
+    for msg in st.session_state.chatbot_messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+    
+    # User input
+    user_input = st.chat_input("Ask about privacy or security...")
+    
+    if user_input:
+        # Add user message
+        st.session_state.chatbot_messages.append({"role": "user", "content": user_input})
+        
+        with st.chat_message("user"):
+            st.markdown(user_input)
+        
+        # Get bot response
+        try:
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel("gemini-2.5-flash")
+            
+            system_prompt = """You are the Digital Privacy Advisor chatbot, an expert in digital privacy and security.
+Provide clear, actionable advice on password security, 2FA, VPNs, data protection, social media privacy, and more.
+Be friendly and non-judgmental. Recommend specific tools when relevant (e.g., Bitwarden, ProtonVPN)."""
+            
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    response = model.generate_content(f"{system_prompt}\n\nUser: {user_input}")
+                    st.markdown(response.text)
+                    st.session_state.chatbot_messages.append({"role": "assistant", "content": response.text})
+        except Exception as e:
+            st.error(f"Error: {e}")
+
+
+def run_structured_assessment():
+    """Run the structured Q&A assessment mode."""
     
     # Assessment flow
     if not st.session_state.assessment_complete:
@@ -252,6 +338,9 @@ def main():
         # Progress bar
         progress = st.session_state.current_question / total_questions
         st.progress(progress)
+        
+        st.markdown("# 🔒 Privacy Assessment Quiz")
+        st.markdown("*Answer 10 quick questions to assess your privacy posture*")
         
         if st.session_state.current_question < total_questions:
             # Display current question

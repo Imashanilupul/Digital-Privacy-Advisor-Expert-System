@@ -76,35 +76,72 @@ When the working memory contains `(user-profile (vpn no))`, this rule fires and 
 
 ## Setup
 
-These commands assume Windows `cmd.exe`. Use similar commands on macOS / Linux (bash/zsh).
+See [INSTALL.md](INSTALL.md) for detailed installation instructions and troubleshooting.
 
-1. Create and activate a virtual environment
+**Quick start (Windows):**
 
 ```bat
 python -m venv .venv
 .venv\Scripts\activate
+python -m pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt --no-cache-dir
 ```
 
-2. Install dependencies
+**On macOS/Linux:**
 
-Install all required packages using the `requirements.txt`:
-
-```bat
-pip install -r requirements.txt
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt --no-cache-dir
 ```
 
-This will install:
-- `streamlit` — for the web-based GUI
-- `pytest` — for running tests
-- `clipspy` — for CLIPS file parsing and execution (optional for CLIPS testing)
+**Verify installation:**
 
-## Running the app — Streamlit GUI
+```bash
+python -c "import streamlit, google.generativeai; print('✓ Ready to go!')"
+```
 
-The repository provides a modern web-based chat interface using Streamlit. From the repository root run:
+## Running the app
+
+### Option 1: Structured Assessment (Q&A Quiz)
 
 ```bat
 streamlit run app.py
 ```
+
+Then select **"Structured Assessment"** from the sidebar. This will:
+- Ask 10 targeted privacy questions
+- Guide you through the assessment with navigation buttons
+- Show prioritized recommendations (🔴 HIGH, 🟡 MEDIUM, 🟢 LOW)
+- Display your overall risk score
+
+### Option 2: AI Chatbot (Free-form Questions)
+
+```bat
+streamlit run app.py
+```
+
+Then select **"AI Chatbot"** from the sidebar. This will:
+- Enable you to ask any privacy/security question in natural language
+- Use Google's Gemini API to provide intelligent responses
+- Maintain conversation context across multiple exchanges
+- Cover all aspects of digital privacy and security
+
+**To use the chatbot:**
+1. Get a free Gemini API key: https://aistudio.google.com/app/apikey
+2. Paste the key in the sidebar when prompted
+3. Start asking questions!
+
+### Alternative: Run the old CLI version
+
+The original CLI chat interface (not recommended) is in `src/main.py`:
+
+```bat
+python -m src.main
+```
+
+## Features
 
 This will:
 - Open your default web browser to `http://localhost:8501`
