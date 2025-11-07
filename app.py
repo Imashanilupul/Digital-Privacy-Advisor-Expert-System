@@ -244,7 +244,7 @@ def main():
     
     # Sidebar mode selector
     with st.sidebar:
-        st.markdown("## � Mode Selection")
+        st.markdown("##  Mode Selection")
         mode = st.radio(
             "Choose interaction mode:",
             ["Structured Assessment", "AI Chatbot"],
