@@ -202,6 +202,8 @@ As long as you:
 ## Next improvements (ideas)
 
 - Add `requirements.txt` and `dev-requirements.txt` to pin dependencies.
+- 
+## Demo Video - https://youtu.be/PPeEg0SyTJE?si=LMiBMcMNisgW57xp
 - Add a GitHub Actions workflow to run pytest and optionally install `clipspy` so CLIPS parser errors are caught on CI.
 - Add more unit tests for `InferenceEngine` covering edge cases (empty inputs, unexpected types).
 - Improve the GUI to allow editing facts and re-running the CLIPS engine interactively.
